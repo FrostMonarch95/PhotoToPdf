@@ -3,7 +3,6 @@ import sys
 from PyQt5.QtWidgets import QPushButton,QGraphicsScene,QShortcut,QMainWindow,QVBoxLayout,QApplication,QAction,QWidget,QGraphicsView,QGraphicsPixmapItem
 from PyQt5.QtGui import QIcon
 from PyQt5 import QtPrintSupport
-import img2pdf
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5 import QtCore
@@ -15,6 +14,33 @@ import cv2
 import numpy as np
 import imutils
 from process import FourCornerExtraction,four_point_transform
+
+class SDialog(QWidget):
+    def __init__(self, parent = None):
+        super(SDialog, self).__init__(parent)
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowTitle("Convert Done!")
+        self.setGeometry(500,500,300,200)
+        #设定窗口标题和窗口的大小和位置。
+        fontL = QtWidgets.QLabel(" Done!\n Check your photo directory")
+        forma=QtGui.QFont( "Arial", 30, QtGui.QFont.Bold)
+        fontL.setFont(forma)
+        inputButton = QPushButton(self.tr("OK"))
+
+        inputButton.clicked.connect(self.openInput)
+        inputButton.setSizePolicy(QtWidgets.QSizePolicy.Fixed,QtWidgets.QSizePolicy.Fixed)
+        grid = QtWidgets.QGridLayout()
+        grid.addWidget(inputButton, 2, 0)
+        grid.addWidget(fontL,1,0)
+        self.setLayout(grid)
+        #把四个按钮控件的clicked（）信号和槽连接
+
+    def openInput(self):
+        self.close()
+
+
 class GripItem(QtWidgets.QGraphicsPathItem):
     circle = QtGui.QPainterPath()
     circle.addEllipse(QtCore.QRectF(-10, -10, 20, 20))
@@ -185,7 +211,10 @@ class App(QMainWindow):
         str=str.join(ls)
         pilimg.save(str)
         pilimg.close()
-
+        dig=SDialog()
+        dig.show()
+        qe = QtCore.QEventLoop()             #   line  3
+        qe.exec_()                            #   line  4
 
 
 
@@ -195,6 +224,7 @@ class App(QMainWindow):
         #self.setGeometry(self.left, self.top, self.width, self.height)
         self.m_view = AnnotationView()
         self.m_scene=AnnotationScene()
+        self.setGeometry(300,300,800,600)
         btn = QPushButton("Convert!")
         btn.pressed.connect( self.buttonevent )
         self.m_view.setScene(self.m_scene)
